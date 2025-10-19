@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script> window.FontAwesomeConfig = { autoReplaceSvg: 'nest'};</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>::-webkit-scrollbar { display: none;}</style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                    colors: {
+                        'primary-text': '#1E1E1E',
+                        'secondary-text': '#333333',
+                        'bg-light': '#FFFFFF',
+                        'bg-grey': '#E0E0E0',
+                        'accent-blue': '#5675DF',
+                        'accent-purple': '#5D2DE6'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-bg-grey font-poppins">
+    
+    <!-- Header -->
+    <header id="header" class="bg-bg-light border-b border-bg-grey px-8 py-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-accent-blue rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-map-location-dot text-white text-lg"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-black">Microburbs Mini Explorer</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center bg-white border border-bg-grey rounded-xl px-4 py-2.5 shadow-sm">
+                    <i class="fa-solid fa-search text-secondary-text mr-3"></i>
+                    <input type="text" id="suburb-input" placeholder="Enter suburb name..." value="Belmont North NSW" 
+                           class="outline-none text-primary-text w-64 font-medium">
+                </div>
+                
+                <select id="property-type-select" class="bg-white border border-bg-grey rounded-xl px-4 py-2.5 shadow-sm text-primary-text font-medium outline-none">
+                    <option value="">All Property Types</option>
+                    <option value="House">House</option>
+                    <option value="Unit">Unit</option>
+                    <option value="Townhouse">Townhouse</option>
+                </select>
+                
+                <button id="search-button" class="bg-accent-blue text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+                    Run Analysis
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-8 py-8">
+        
+        <!-- KPI Cards -->
+        <section id="kpi-section" class="mb-8">
+            <div class="grid grid-cols-5 gap-6">
+                <div id="kpi-card-1" class="bg-bg-light rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div class="text-3xl font-bold text-black mb-2">247</div>
+                    <div class="text-secondary-text text-sm font-medium">Active Listings</div>
+                </div>
+                
+                <div id="kpi-card-2" class="bg-bg-light rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div class="text-3xl font-bold text-black mb-2">$1.2M</div>
+                    <div class="text-secondary-text text-sm font-medium">Median Price</div>
+                </div>
+                
+                <div id="kpi-card-3" class="bg-bg-light rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div class="text-3xl font-bold text-black mb-2">3.2</div>
+                    <div class="text-secondary-text text-sm font-medium">Median Bedrooms</div>
+                </div>
+                
+                <div id="kpi-card-4" class="bg-bg-light rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div class="text-3xl font-bold text-black mb-2">678m²</div>
+                    <div class="text-secondary-text text-sm font-medium">Median Land Size</div>
+                </div>
+                
+                <div id="kpi-card-5" class="bg-bg-light rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                    <div class="text-3xl font-bold text-black mb-2">42</div>
+                    <div class="text-secondary-text text-sm font-medium">Days on Market</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Price Distribution Chart -->
+        <section id="chart-section" class="mb-8">
+            <div class="bg-bg-light rounded-xl p-8 shadow-sm border border-gray-100">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-black mb-2">Price Distribution</h2>
+                    <p class="text-secondary-text">Current market price ranges for properties in Belmont North NSW</p>
+                </div>
+                <div id="price-chart" class="h-80"></div>
+            </div>
+        </section>
+
+        <!-- Property Listings -->
+        <section id="listings-section">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-black mb-2">Property Listings</h2>
+                <p class="text-secondary-text">Recent properties available in this area</p>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-6" id="property-listings-grid">
+                <div id="property-card-1" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dc39fb9795-b501206af9920ad348ab.png" alt="modern australian house exterior with front yard" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$1,450,000</div>
+                        <div class="text-primary-text font-medium mb-3">42 Lakeside Drive, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">4</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">720m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">Belle Property Newcastle</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div id="property-card-2" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/8d4603f97d-ea527144d428728d2bf6.png" alt="contemporary brick house with garden" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$1,200,000</div>
+                        <div class="text-primary-text font-medium mb-3">15 Ocean View Terrace, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">3</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">1</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">580m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">Ray White Newcastle</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div id="property-card-3" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/8fe8fa5e3b-e08264255c0ca194b933.png" alt="family home with double garage australia" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$980,000</div>
+                        <div class="text-primary-text font-medium mb-3">8 Hillcrest Avenue, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">3</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">1</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">650m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">LJ Hooker Belmont</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div id="property-card-4" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/dc95a09457-d866f0036f8f1212ed62.png" alt="renovated weatherboard house australia" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$1,650,000</div>
+                        <div class="text-primary-text font-medium mb-3">23 Waterfront Close, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">4</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">3</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">850m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">Century 21 Newcastle</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div id="property-card-5" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/5631cce809-f7e0c6c9cb085d28a7da.png" alt="single story brick home with lawn" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$1,100,000</div>
+                        <div class="text-primary-text font-medium mb-3">17 Garden Street, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">3</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">1</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">600m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">First National Newcastle</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+
+                <div id="property-card-6" class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <img class="w-full h-48 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/83cecde9dd-323f0335235a46888573.png" alt="two story house with balcony australia" />
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">$1,320,000</div>
+                        <div class="text-primary-text font-medium mb-3">5 Sunset Boulevard, Belmont North</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">4</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">2</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">700m²</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">Raine & Horne Newcastle</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Listing
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Initialize price distribution chart
+        Highcharts.chart('price-chart', {
+            chart: {
+                type: 'column',
+                backgroundColor: 'transparent'
+            },
+            credits: {enabled: false},
+            title: {text: null},
+            xAxis: {
+                categories: ['$800K-$1M', '$1M-$1.2M', '$1.2M-$1.4M', '$1.4M-$1.6M', '$1.6M-$1.8M', '$1.8M+'],
+                labels: {
+                    style: {color: '#333333', fontFamily: 'Poppins', fontSize: '12px'}
+                },
+                gridLineColor: '#E0E0E0'
+            },
+            yAxis: {
+                title: {
+                    text: 'Number of Properties',
+                    style: {color: '#333333', fontFamily: 'Poppins', fontWeight: '500'}
+                },
+                labels: {
+                    style: {color: '#333333', fontFamily: 'Poppins', fontSize: '12px'}
+                },
+                gridLineColor: '#E0E0E0'
+            },
+            plotOptions: {
+                column: {
+                    borderRadius: 4,
+                    pointPadding: 0.1,
+                    groupPadding: 0.1
+                }
+            },
+            series: [{
+                name: 'Properties',
+                data: [18, 42, 35, 28, 15, 9],
+                color: '#5D2DE6',
+                showInLegend: false
+            }]
+        });
+
+        // Add animation to KPI cards on load
+        window.addEventListener('load', function() {
+            const kpiCards = document.querySelectorAll('[id^="kpi-card-"]');
+            kpiCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(-4px)';
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(0)';
+                    }, 200);
+                }, index * 100);
+            });
+        });
+
+        // Phase 3: Real API integration
+        document.getElementById('search-button').addEventListener('click', async function() {
+            const suburb = document.getElementById('suburb-input').value.trim();
+            const propertyType = document.getElementById('property-type-select').value.trim();
+            
+            if (!suburb) {
+                alert('Please enter a suburb name');
+                return;
+            }
+            
+            // Show loading state
+            showLoadingState();
+            
+            try {
+                // Make API call to backend
+                const params = new URLSearchParams({ suburb });
+                if (propertyType) params.append('property_type', propertyType);
+                
+                const response = await fetch(`/api/suburb/properties?${params}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update the dashboard with real data
+                    updateDashboard(data);
+                } else {
+                    showError(data.error || 'Failed to fetch property data');
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                hideLoadingState();
+            }
+        });
+
+        function showLoadingState() {
+            const button = document.getElementById('search-button');
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading...';
+            button.disabled = true;
+            
+            // Show loading overlay on KPI cards
+            document.querySelectorAll('[id^="kpi-card-"]').forEach(card => {
+                card.style.opacity = '0.5';
+            });
+        }
+
+        function hideLoadingState() {
+            const button = document.getElementById('search-button');
+            button.innerHTML = 'Run Analysis';
+            button.disabled = false;
+            
+            // Remove loading overlay
+            document.querySelectorAll('[id^="kpi-card-"]').forEach(card => {
+                card.style.opacity = '1';
+            });
+        }
+
+        function showError(message) {
+            alert(`Error: ${message}`);
+        }
+
+        function updateDashboard(data) {
+            const { summary, listings } = data;
+            
+            // Update KPI cards with real data
+            updateKPICards(summary);
+            
+            // Update price distribution chart
+            updatePriceChart(summary.price_bins);
+            
+            // Update property listings
+            updatePropertyListings(listings);
+            
+            // Update chart section title
+            const chartTitle = document.querySelector('#chart-section h2');
+            const chartSubtitle = document.querySelector('#chart-section p');
+            chartTitle.textContent = 'Price Distribution';
+            chartSubtitle.textContent = `Current market price ranges for properties in ${summary.suburb}`;
+        }
+
+        function updateKPICards(summary) {
+            const kpiCards = [
+                { id: 'kpi-card-1', value: summary.count, label: 'Active Listings' },
+                { id: 'kpi-card-2', value: summary.median_price, label: 'Median Price', format: 'currency' },
+                { id: 'kpi-card-3', value: summary.median_bedrooms, label: 'Median Bedrooms', format: 'number' },
+                { id: 'kpi-card-4', value: summary.median_land_sqm, label: 'Median Land Size', format: 'land' },
+                { id: 'kpi-card-5', value: summary.median_garage_spaces, label: 'Median Garage Spaces', format: 'number' }
+            ];
+            
+            kpiCards.forEach(card => {
+                const element = document.getElementById(card.id);
+                const valueElement = element.querySelector('.text-3xl');
+                const labelElement = element.querySelector('.text-secondary-text');
+                
+                if (card.value !== null && card.value !== undefined) {
+                    let displayValue;
+                    switch (card.format) {
+                        case 'currency':
+                            displayValue = `$${(card.value / 1000).toFixed(0)}K`;
+                            break;
+                        case 'land':
+                            displayValue = `${card.value}m²`;
+                            break;
+                        case 'number':
+                            displayValue = card.value.toFixed(1);
+                            break;
+                        default:
+                            displayValue = card.value.toString();
+                    }
+                    valueElement.textContent = displayValue;
+                } else {
+                    valueElement.textContent = '—';
+                }
+                
+                labelElement.textContent = card.label;
+            });
+        }
+
+        function updatePriceChart(priceBins) {
+            if (!priceBins || priceBins.length === 0) {
+                document.getElementById('chart-section').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('chart-section').style.display = 'block';
+            
+            // Update Highcharts with real data
+            const chart = Highcharts.charts[0]; // Get the existing chart
+            if (chart) {
+                chart.series[0].setData(priceBins.map(bin => bin.count));
+                chart.xAxis[0].setCategories(priceBins.map(bin => bin.label));
+            }
+        }
+
+        function updatePropertyListings(listings) {
+            const grid = document.getElementById('property-listings-grid');
+            
+            if (!listings || listings.length === 0) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-8 text-gray-500">No properties found for this suburb.</div>';
+                return;
+            }
+            
+            // Generate property cards dynamically
+            grid.innerHTML = listings.slice(0, 6).map(property => createPropertyCard(property)).join('');
+        }
+
+        function createPropertyCard(property) {
+            const bedrooms = property.bedrooms ? property.bedrooms.toString() : '—';
+            const bathrooms = property.bathrooms ? property.bathrooms.toString() : '—';
+            const carSpaces = property.car_spaces ? property.car_spaces.toString() : '—';
+            const landSize = property.land_size ? `${property.land_size}m²` : '—';
+            
+            return `
+                <div class="bg-bg-light rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                    <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                        <i class="fa-solid fa-home text-4xl text-gray-400"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-xl font-bold text-black mb-2">${property.price_text || 'Price on request'}</div>
+                        <div class="text-primary-text font-medium mb-3">${property.address || 'Address not available'}</div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bed mr-1"></i>
+                                <span class="text-sm">${bedrooms}</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-bath mr-1"></i>
+                                <span class="text-sm">${bathrooms}</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-car mr-1"></i>
+                                <span class="text-sm">${carSpaces}</span>
+                            </div>
+                            <div class="flex items-center text-secondary-text">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                                <span class="text-sm">${landSize}</span>
+                            </div>
+                        </div>
+                        <div class="text-secondary-text text-sm mb-4">${property.property_type || 'Property'}</div>
+                        <button class="w-full bg-accent-blue text-white py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+
+</body>
+</html>
