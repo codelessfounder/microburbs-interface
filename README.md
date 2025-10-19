@@ -1,6 +1,6 @@
 Microburbs Mini Explorer
 
-A clean, data-driven property insights dashboard built to visualise real-time property data from the Microburbs API. It helps users explore suburb-level metrics such as median prices, dwelling sizes, and market distribution in a simple, interactive way.
+This project connects to the Microburbs API to generate live suburb-level property insights through an interactive dashboard. It summarises key market indicators — active listings, indicative median price, median bedrooms, land size, and days on market — and visualises local price distributions. The interface is designed for clarity using similat microburbs UI. 
 
 Phase 1: Foundation Setup
 
@@ -103,35 +103,3 @@ Enter a suburb name (e.g. “Belmont North”).
 Click “Run Analysis.”
 
 The dashboard updates with live metrics, chart, and property listings.
-
-Phase 4: Final Polish
-
-What’s working
-
-Fully dynamic property cards with address, price, bedrooms, bathrooms, and land size
-
-Improved formatting and spacing for clarity
-
-Responsive grid layout for all screen sizes
-
-Refined transitions, hover states, and loading indicators
-
-Graceful error handling for any failed API calls
-
-Complete feature set
-
-Live data from Microburbs API
-
-Calculated medians for key property stats
-
-Interactive chart visualising local price segments
-
-Responsive design and clean, modern interface
-
-Smooth animations and well-defined loading states
-
-Final Summary
-
-The Microburbs Mini Explorer is a fully functional prototype showing how complex property data can be made simple and intuitive for investors. It combines a clean, responsive frontend with live API data, statistical analysis, and clear visual feedback — a practical foundation for a scalable property insights tool.
-
-**Note**: This is a demonstration project for the Microburbs Analyst Developer position, showcasing the ability to create a professional, data-driven property insights dashboard.
